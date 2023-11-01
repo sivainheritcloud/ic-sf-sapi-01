@@ -1,0 +1,8 @@
+%dw 2.0
+
+type auto_8e18e003_63e3_4395_92ce_9ac430d59ae3_Input_Variables_vErrorMapping = {|
+  httpStatus: Number, 
+  errorCode: String, 
+  errorDescription: String
+|}
+

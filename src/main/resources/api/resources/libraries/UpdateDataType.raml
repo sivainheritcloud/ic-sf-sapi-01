@@ -1,0 +1,29 @@
+#%RAML 1.0 Library
+types:
+  update_task:  
+    description: updating an task
+    type: object
+    properties:
+        
+  update_task_response:
+    type: object
+    properties:
+      is_success :
+        description: Success
+        type: boolean
+        required: true
+      errors:
+        type: array
+        description: Errors
+        required: false
+        items:
+          properties:
+            error_code:
+              type: string
+              description: Unique error code
+              required: false
+            error_message:
+              type: string
+              description: Indicates a message associated with its error code.
+              required: false     
+  

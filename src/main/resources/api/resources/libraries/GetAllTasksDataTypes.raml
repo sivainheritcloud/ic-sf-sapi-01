@@ -1,0 +1,36 @@
+#%RAML 1.0 Library
+types:
+  get_all_tasks_response:
+    description: retreiving all tasks
+    type: array
+    items:
+      properties:
+        owner_Id:
+          description: owner Id
+          type: string
+          required: false
+        priority:
+          description: priority of the task
+          type: string
+          required: false
+        description:
+          description: description of the task
+          type: string
+          required: false
+        status:
+          description: status of the task
+          type: string
+          required: false
+        subject:
+          description: subject of the task
+          type: string
+          required: false
+        callobject:
+          type: string
+          required: true
+        calldisposition:
+          type: string
+          required: true  
+        calldurationinseconds:
+          type: number
+          required: true          

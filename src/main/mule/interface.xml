@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <apikit:config name="ic-task-sapi-config" api="ic-task-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="ic-task-sapi-main">
+        <http:listener config-ref="ic-task-sapi-httpListenerConfig1" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="ic-task-sapi-config" />
+        <error-handler ref="common-error-handlerError_Handler" />
+    </flow>
+    <flow name="ic-task-sapi-console">
+        <http:listener config-ref="ic-task-sapi-httpListenerConfig1" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="ic-task-sapi-config" />
+        <error-handler ref="common-error-handlerError_Handler" />
+    </flow>
+    <flow name="put:\task:application\json:ic-task-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="3bc4c530-83b2-4d7e-ae35-ae187e160099" name="update_task" />
+    </flow>
+    <flow name="delete:\task\(id):ic-task-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="d80f2862-5bc7-42bf-964d-4b442c7a90b0" name="delete_task" />
+    </flow>
+    <flow name="get:\task:ic-task-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="5605e3ba-55a6-4eec-8708-20fec6285a6e" name="get_all_tasks" />
+    </flow>
+    <flow name="get:\task\(id):ic-task-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="e5e0c614-e291-4422-9887-329157239a19" name="get_by_id" />
+    </flow>
+    <flow name="post:\task:application\json:ic-task-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="a9196426-ccd5-4343-9c7d-61b961ada387" name="creating_new_task" />
+    </flow>
+    <flow name="put:\task\(id):application\json:ic-task-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="ab2ca6b2-5b55-403f-9b43-f0aac1afcfe5" name="update_task" />
+    </flow>
+</mule>

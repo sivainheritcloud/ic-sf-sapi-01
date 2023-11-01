@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_c1fe0c9d_8efa_4c96_8047_5d50055fe301_Input_Payload = {
+  owner_Id?: String, 
+  subject?: String, 
+  description?: String, 
+  priority?: String, 
+  status?: String, 
+  _?: Any
+} {"description": "updating an task"}
+

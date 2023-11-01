@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_35e7ea66_a061_469d_8443_d3ea0f0cb200_Input_Payload = {
+  owner_Id: String, 
+  subject: String, 
+  description: String, 
+  priority: String, 
+  status: String, 
+  _?: Any
+} {"description": "creating new task"}
+

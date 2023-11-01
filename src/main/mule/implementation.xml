@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="get_all_tasks" doc:id="6dbca157-6fec-45ed-a00a-0861fece77ed" >
+		<logger level="INFO" doc:name="get All created tasks of sfdc implementation flow started" doc:id="8b039eb7-06b1-488a-875b-df7270eef2b7" message="get All created tasks of sfdc implementation flow started"/>
+		<salesforce:query-all doc:name="Query  for all tasks from sfdc" doc:id="74b16eb5-42bb-4738-96b4-cdf6d33110ce" config-ref="Salesforce_Config1">
+			<salesforce:salesforce-query ><![CDATA[SELECT AccountId,ActivityDate,CallDisposition,CallDurationInSeconds,CallObject,CallType,CompletedDateTime,CreatedById,CreatedDate,Description,Id,IsArchived,IsClosed,IsDeleted,IsHighPriority,IsRecurrence,IsReminderSet,LastModifiedById,LastModifiedDate,OwnerId,Priority,RecurrenceActivityId,RecurrenceDayOfMonth,RecurrenceDayOfWeekMask,RecurrenceEndDateOnly,RecurrenceInstance,RecurrenceInterval,RecurrenceMonthOfYear,RecurrenceRegeneratedType,RecurrenceStartDateOnly,RecurrenceTimeZoneSidKey,RecurrenceType,ReminderDateTime,Status,Subject,SystemModstamp,TaskSubtype,WhatId,WhoId FROM Task]]></salesforce:salesforce-query>
+		</salesforce:query-all>
+		<ee:transform doc:name="Dw set retrive all tasks response from sfdc" doc:id="f3e11381-29e7-44f8-a40c-5f6a4075385b" >
+			<ee:message >
+				<ee:set-payload resource="getAllOutput.dwl" />
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="314f82d4-1a6a-4967-8373-2f4efe2ee02b">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="get All created tasks of sfdc implementation flow ended" doc:id="21d93bd8-d8c1-421e-af42-bfe0ced39157" message="get All created tasks of sfdc implementation flow ended"/>
+	</sub-flow>
+	<sub-flow name="creating_new_task" doc:id="35e7ea66-a061-469d-8443-d3ea0f0cb200" >
+		<logger level="INFO" doc:name="creating a new task in sfdc implementation flow started" doc:id="91b110da-f1dc-40a9-8071-4e0208773a80" message="creating a new task in sfdc implementation flow started"/>
+		<ee:transform doc:name="Dw set create new task request transform" doc:id="ba6d21b8-2bb8-4b0a-8ce6-7d28cc35aeff">
+			<ee:message>
+				<ee:set-payload resource="creatingnewtask.dwl" />
+			</ee:message>
+		</ee:transform>
+		<salesforce:create doc:name="Creating a new task with payload which is taken as a request from transform message " doc:id="156c661c-0ee5-4da7-bfd7-7610f5cd4699" type="Task" config-ref="Salesforce_Config1"/>
+		<ee:transform doc:name="Transform Message" doc:id="f933f3e1-228a-48e3-96ae-b37475e378bd">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+        "is_success": payload.items.successful,
+    "response": payload.items map(item,index) ->{
+        "payload": item.payload
+    }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="creating a new task in sfdc implementation flow ended" doc:id="8aa7e9a4-38e0-4aeb-9469-39c531f752b3" message="creating a new task in sfdc implementation flow ended"/>
+	</sub-flow>
+	<sub-flow name="delete_task" doc:id="0a255c59-abc7-443a-a7d0-1d62b3b3167f" >
+		<logger level="INFO" doc:name="deletion of particular task from sfdc implementation flow started" doc:id="a7e8d48c-8755-4863-8753-89ef926246c1" message="deletion of particular task from sfdc implementation flow started"/>
+		<salesforce:query doc:name="Query to select particular id and send it to transform message as payload" doc:id="aac9acf8-bbaa-45e2-a47c-46a15e1f1da1" config-ref="Salesforce_Config1">
+			<salesforce:salesforce-query ><![CDATA[select Id,Subject from Task where Id = ':id']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[{
+	"id": attributes.uriParams.id
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="taking a responce from query as payload" doc:id="0fea89cb-5cf6-4a69-ab9d-cc3065599922">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:delete doc:name="deletion of particular id which is taken as request from transform message" doc:id="e71bd4e1-0f19-4456-9bb2-5af0d4e61828" config-ref="Salesforce_Config1">
+			<salesforce:ids ><![CDATA[#[payload.Id]]]></salesforce:ids>
+		</salesforce:delete>
+		<ee:transform doc:name="Transform Message" doc:id="3c5bcfa9-cc41-40de-90b8-a65f3243d9e8">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+        "is_success": payload.items.successful,
+    "response": payload.items map(item,index) ->{
+        "payload": item.payload
+    }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="deletion of particular task from sfdc implementation flow ended" doc:id="809ceb41-bd12-4501-b66b-47002201535a" message="deletion of particular task from sfdc implementation flow ended"/>
+	</sub-flow>
+	<sub-flow name="update_task" doc:id="c1fe0c9d-8efa-4c96-8047-5d50055fe301" >
+		<logger level="INFO" doc:name="updating a particular task from sfdc implementation flow started" doc:id="a996fef4-1afb-482c-a813-49995f209a0b" message="updating a particular task from sfdc implementation flow started"/>
+		<ee:transform doc:name="Dw  will used to send update request to update" doc:id="728b9697-3c48-4cff-b0f2-ba8c73864995" >
+			<ee:message >
+				<ee:set-payload resource="updatingtask_id.dwl" />
+			</ee:message>
+		</ee:transform>
+		<salesforce:update doc:name="Update the request  by id which is taken from transform message" doc:id="bc086848-f0ad-4bb6-aa6f-5eb8d1d0434d" type="Task" config-ref="Salesforce_Config1"/>
+		<ee:transform doc:name="Transform Message" doc:id="4c9dc442-914f-4f9b-8667-f2f3674d3c12">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+        "is_success": payload.items.successful,
+    "response": payload.items map(item,index) ->{
+        "payload": item.payload
+    }
+    
+    }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="updating a particular task from sfdc implementation flow ended" doc:id="cdf19bfa-13c2-4734-8645-42a431cb124f" message="updating a particular task from sfdc implementation flow ended"/>
+	</sub-flow>
+	<sub-flow name="get_by_id" doc:id="f9e298ed-11b3-4ed8-8df5-39b3ec4353cf" >
+		<logger level="INFO" doc:name="retriving a particular task by id from sfdc implementation flow started" doc:id="06132da4-66fc-4e96-acc1-a3ef9ad15285" message="retriving a particular task by id from sfdc implementation flow started"/>
+		<salesforce:query doc:name="Query to get task only by id" doc:id="d4288b08-479a-4e82-b983-3d1d4c16505c" config-ref="Salesforce_Config1">
+			<salesforce:salesforce-query ><![CDATA[SELECT Id,OwnerId,Priority,Status,Subject,CallObject,CallDisposition,CallDurationInSeconds FROM Task where Id = ':id']]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[{
+	"id": attributes.uriParams.id
+}]]]></salesforce:parameters>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="35080150-7fab-4d86-8c36-6462a5369d53">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="retriving a particular task by id from sfdc implementation flow ended" doc:id="f8e53196-4d87-4c6a-a196-09009c064682" message="retriving a particular task by id from sfdc implementation flow ended"/>
+	</sub-flow>
+</mule>

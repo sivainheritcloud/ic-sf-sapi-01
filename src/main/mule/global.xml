@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="f851337a-d554-4dde-b0ef-55fabe175407" file="dev.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="34c7ff34-8d5e-4dd9-9ace-e4b18bf1f427" file="dev.yaml" key="Siva@193654" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="8462983a-8921-4fa0-bb8a-45d7244e25c1" file="common.yaml" />
+	    <http:listener-config name="ic-task-sapi-httpListenerConfig1">
+        <http:listener-connection host="${https.host}" port="${https.port}" protocol="HTTPS">
+			<tls:context >
+				<tls:key-store type="jks" path="server-keystore.jks" keyPassword="mulesoft" password="mulesoft" />
+			</tls:context>
+		</http:listener-connection>
+    </http:listener-config>
+	<configuration doc:name="Configuration" doc:id="fc9e346d-d1d9-4fd5-aa70-b1866174079c" defaultErrorHandler-ref="common-error-handlerError_Handler" />
+	<salesforce:sfdc-config name="Salesforce_Config1" doc:name="Salesforce Config" doc:id="4ad013d5-aea3-4006-811f-b8bbc98ed077" >
+		<salesforce:basic-connection username="${secure::username}" password="${secure::password}" securityToken="${secure::security token}" />
+	</salesforce:sfdc-config>
+	<api-gateway:autodiscovery apiId="19070041" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="58b269c5-6ddf-468d-870a-a6fee4cde12c" flowRef="ic-task-sapi-main" />
+	    	
+</mule>

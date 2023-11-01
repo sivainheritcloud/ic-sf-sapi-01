@@ -1,0 +1,57 @@
+#%RAML 1.0 Library
+types:
+  add_new_task:
+    description: creating new task
+    type: object
+    properties:
+        owner_id:
+          description: owner Id
+          type: string
+          required: true
+        priority:
+          description: priority of the task
+          type: string
+          required: true
+        description:
+          description: description of the task
+          type: string
+          required: true
+        status:
+          description: status of the task
+          type: string
+          required: true
+        subject:
+          description: subject of the task
+          type: string
+          required: true
+        callobject:
+          type: string
+          required: true
+        calldisposition:
+          type: string
+          required: true  
+        calldurationinseconds:
+          type: number
+          required: true  
+
+  task_added_response:
+    description: Pick Release Response
+    properties:
+      is_success :
+        description: Success
+        type: boolean
+        required: true
+      errors:
+        type: array
+        description: Errors
+        required: false
+        items:
+          properties:
+            error_code:
+              type: string
+              description: Unique error code
+              required: false
+            error_message:
+              type: string
+              description: Indicates a message associated with its error code.
+              required: false        
